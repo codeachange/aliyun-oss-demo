@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>阿里云OSS上传Demo</title>
+</head>
+<body>
+
+<form action="" enctype="multipart/form-data" method="POST" id="uploadForm">
+    <input type="hidden" id="key" name="key">
+    <input type="hidden" id="OSSAccessKeyId" name="OSSAccessKeyId">
+    <input type="hidden" id="policy" name="policy">
+    <input type="hidden" id="Signature" name="Signature">
+    <input type="file" name="file" id="file">
+</form>
+
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+<script type="text/javascript">
+    var tokenUrl = 'http://localhost:8080/getUploadToken';
+
+    $('#file').change(function(){
+        var fileName = this.value;
+
+        // 获取上传地址
+        $.get(tokenUrl, {fileName: fileName}, function(uploadToken){
+            console.log('uploadToken: ', uploadToken);
+
+            $('#OSSAccessKeyId').val(uploadToken.accessKey);
+            $('#policy').val(uploadToken.policy);
+            $('#Signature').val(uploadToken.signature);
+            $('#key').val(uploadToken.key);
+
+            // 上传
+            var formData = new FormData($('#uploadForm').get(0));
+            $.ajax({
+                url: uploadToken.uploadUrl,
+                type: 'POST',
+                data: formData,
+                async: false,
+                success: function (data) {
+                    console.log('上传成功: ', uploadToken.uploadUrl + "/" + uploadToken.key);
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+    });
+</script>
+</body>
+</html>
