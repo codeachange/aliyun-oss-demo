@@ -56,6 +56,9 @@ public class FileController {
 
         // 签名
         String postSignature = client.calculatePostSignature(postPolicy);
+        
+        // 重要，OSSClient用完要关掉，不然会内存泄漏
+        ossClient.shutdown();
 
         UploadTokenVo uploadTokenVo = new UploadTokenVo();
         uploadTokenVo.setAccessKey(accessKey);
